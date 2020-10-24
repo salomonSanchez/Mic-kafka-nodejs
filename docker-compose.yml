@@ -1,0 +1,29 @@
+version: "3"
+services: 
+  restapi:
+    build: ms-mensaje
+    container_name: container-restapi
+    ports:
+      - "4000:4000"
+  zookeeper:
+    image: zookeeper:3.4.9
+    container_name: container-zookeeper
+    hostname: zookeeper
+    ports:
+      - "2181:2181"
+  kafka1:
+    image: confluentinc/cp-kafka:5.3.0
+    container_name: container-kafka
+    hostname: kafka1
+    ports:
+      - "9091:9091"
+    environment:
+      KAFKA_BROKER_ID: -1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: LISTENER_DOCKER_INTERNAL://kafka1:19091,LISTENER_DOCKER_EXTERNAL://168.63.55.148:9092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: LISTENER_DOCKER_INTERNAL:PLAINTEXT,LISTENER_DOCKER_EXTERNAL:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: LISTENER_DOCKER_INTERNAL
+      KAFKA_CREATE_TOPICS: "issue-certificate,certification-response"
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+    volumes:
+      - ./data/kafka1/data:/var/lib/kafka/data
